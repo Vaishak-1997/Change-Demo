@@ -38,7 +38,7 @@ jobs:
         id: create
         with:
           devops-integration-user-name: ${{ secrets.DevOps Integration User }}
-          devops-integration-user-password: ${{ secrets.Devops@2024 }}
+          devops-integration-user-password: ${{ secrets.Devops@123 }}
           instance-url: ${{ secrets.https://dev258552.service-now.com/ }}
           tool-id: ${{ secrets.DevOps___19700101215101_Git7 }}
           context-github: ${{ toJSON(github) }}
