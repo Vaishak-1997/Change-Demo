@@ -1,5 +1,4 @@
-name: Test
-
+name: Node.js CI
 
 on:
   workflow_dispatch:
@@ -13,24 +12,25 @@ jobs:
   
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: Set Node.js 12.x
-      uses: actions/setup-node@v1
+    - name: Set Node.js 20.x
+      uses: actions/setup-node@v4
       with:
-        node-version: 12.x
+        node-version: 20.x
 
-    - name: Install dependencies
+    - name: Install package-lock
+      run: npm install --save moment
+      
+    - name: Install npm
       run: npm ci
 
     - name: Compile
-      run: npm run build
-
-    
+      run: npm run build --if-present
   changeApproval:
     name: ServiceNow Change Approval
     needs: build
-    runs-on: ubutun-latest
+    runs-on: ubuntu-latest
 
     steps:     
       - name: ServiceNow Change Approval
@@ -39,6 +39,8 @@ jobs:
         with:
           devops-integration-user-name: ${{ secrets.SN_DEVOPS_USER }}
           devops-integration-user-password: ${{ secrets.SN_DEVOPS_PASSWORD }}
+          #devops-integration-user-name: 'devops.integration.user'
+          #devops-integration-user-password: '6[q$oMR1OJMo3=Zs-t%$q,xwbOE7]?u7jTNRx4SvcI[[QwtPLw(*w&D_M5<(eq;sKv63Sq?X@O1!KNxB^prZwt<Ja)NL)&7)4:Tb'
           instance-url: ${{ secrets.SN_INSTANCE_URL }}
           tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
           context-github: ${{ toJSON(github) }}
@@ -51,12 +53,13 @@ jobs:
           abortOnChangeStepTimeout: true
       - name: Output of Change Creation
         run: echo "change-request-number = ${{ steps.create.outputs.change-request-number }} and change-request-sys-id = ${{ steps.create.outputs.change-request-sys-id }} " >> $GITHUB_OUTPUT
-    
+        
   deploy:
     name: Deploy
     needs: changeApproval
-    runs-on: ubutun-latest
-
+    runs-on: ubuntu-latest
     steps:     
       - name: Run Deployment Script
         run: echo "Deployment Finished....."
+
+
