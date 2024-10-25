@@ -2,57 +2,31 @@ trigger: none
 
 pool:
   vmImage: ubuntu-latest
-
+ 
 stages:
         
-  - stage: Build
+  - stage: Prod    
     jobs:
-      - job: Build_Artifacts
-        pool: vmImage
-        steps:
-          - script: echo "Building and preparing artifacts..."
-          # Add any build steps you need here
-          
-          # Publish artifacts
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'  # Replace with the actual path of files you want to publish
-              ArtifactName: 'myArtifact'  # This is the name of the artifact to be used in subsequent stages
-
-  - stage: Prod
-    dependsOn: Build
-    jobs:
-      - job: Final_Deployment
-        pool: server
-        steps:
-          # Download artifacts from the Build stage
-          - task: DownloadBuildArtifacts@0
-            inputs:
-              buildType: 'current'
-              downloadPath: '$(System.ArtifactsDirectory)'
-
-          # Deploy step
-          - task: ServiceNow-DevOps-Server-Change-Acceleration@1
-            inputs:
-              connectedServiceName: 'dev258552-VSK Project 1-ServiceNow DevOps Service Connection'
-              changeRequestDetails: |
-                {
-                    "setCloseCode" : true,
-                    "autoCloseChange" : true,
-                    "attributes": {
-                      "requested_by": {
-                        "name": "Abel Tuter"
-                      },
-                      "start_date": "2025-01-05 08:00:00",
-                      "end_date": "2025-01-08 08:00:00",
-                      "cab_required": "yes",
-                      "assignment_group": {
-                        "name": "Analytics Settings Managers"
-                      }
+     - job: Final_Deployment
+       pool: server
+       steps:
+#- script: echo This is the production deployement phase!
+        - task: ServiceNow-DevOps-Server-Change-Acceleration@1
+          inputs:
+            connectedServiceName: 'dev258552-VSK Project 1-ServiceNow DevOps Service Connection'
+            changeRequestDetails: |
+              {
+                  "setCloseCode" : true,
+                  "autoCloseChange" : true,
+                  "attributes": {
+                    "requested_by": {
+                      "name": "Abel Tuter"
+                    },
+                    "start_date": "2025-01-05 08:00:00",
+                    "end_date": "2025-01-08 08:00:00",
+                    "cab_required": "yes",
+                    "assignment_group": {
+                      "name": "Analytics Settings Managers"
                     }
                   }
-
-          # Example script to verify artifacts
-          - script: |
-              echo "Verifying artifacts"
-              ls $(System.ArtifactsDirectory)
+                }
